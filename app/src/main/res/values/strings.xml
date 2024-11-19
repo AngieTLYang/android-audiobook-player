@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Audiobook player</string>
+    <string name="title">Title</string>
+    <string name="author">Author</string>
+    <string name="play_button_description">Play</string>
+    <string name="pause_button_description">Pause</string>
+    <string name="stop_button_description">Stop</string>
+    <string name="fast_forward_button_description">Skip Forward</string>
+</resources>
