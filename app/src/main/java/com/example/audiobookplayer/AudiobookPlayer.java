@@ -19,9 +19,9 @@ public class AudiobookPlayer extends RecyclerView.Adapter<AudiobookPlayer.Audiob
     private long savedPosition = 0; // Save the position when paused or stopped
     private Audiobook.AudiobookPlayerState state;
     private List<Audiobook> audiobookList; // List of audiobooks
-    private Context context;
     private MediaPlayer mediaPlayer;
     private OnAudiobookClickListener listener; // Listener for item clicks
+
     // Interface to handle audiobook play button clicks
     public interface OnAudiobookClickListener {
         void onAudiobookClick(Audiobook audiobook);
@@ -61,7 +61,11 @@ public class AudiobookPlayer extends RecyclerView.Adapter<AudiobookPlayer.Audiob
                 mediaPlayer.release();
                 mediaPlayer = null; // Reset MediaPlayer
             }
-
+/*
+Summary:
+Call release() if you want to completely free up system resources and you're done with the MediaPlayer for that session. But this requires creating a new MediaPlayer every time you want to play a new audio.
+Call reset() if you're planning to reuse the same MediaPlayer instance but just need to reset it to handle a new audio file. This is more efficient if you want to keep using the same instance.
+*/
             // Initialize a new MediaPlayer instance
             mediaPlayer = new MediaPlayer();
 
@@ -159,11 +163,6 @@ public class AudiobookPlayer extends RecyclerView.Adapter<AudiobookPlayer.Audiob
     }
 
     public void load(String filePath, float speed) {
-        if (mediaPlayer == null) {
-            mediaPlayer = new MediaPlayer();
-        } else {
-            mediaPlayer.reset();
-        }
 
         try {
             // Configure MediaPlayer
@@ -175,11 +174,6 @@ public class AudiobookPlayer extends RecyclerView.Adapter<AudiobookPlayer.Audiob
             mediaPlayer.setDataSource(filePath);
             mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(speed));
             mediaPlayer.prepare();
-
-            // Start playback
-            mediaPlayer.start();
-            state = Audiobook.AudiobookPlayerState.PLAYING;
-
         } catch (IOException | IllegalArgumentException e) {
             Log.e("AudiobookPlayer", "Error loading audiobook: " + e.toString());
             e.printStackTrace();
@@ -192,7 +186,6 @@ public class AudiobookPlayer extends RecyclerView.Adapter<AudiobookPlayer.Audiob
         TextView tvTitle;
         TextView tvAuthor;
         ImageButton btnPlay, btnPause, btnStop, btnSkip;
-
         public AudiobookViewHolder(@NonNull View itemView) {
             super(itemView);
             // Initialize views
@@ -204,54 +197,4 @@ public class AudiobookPlayer extends RecyclerView.Adapter<AudiobookPlayer.Audiob
             btnSkip = itemView.findViewById(R.id.btnSkip);
         }
     }
-
-    // Method to start playing
-    private void startPlaying(Audiobook audiobook, Context context) {
-        if (mediaPlayer != null) {
-            mediaPlayer.release();  // Release any previously playing audio
-        }
-
-        try {
-            mediaPlayer = new MediaPlayer();
-            String filePath = audiobook.getFilePath();
-
-            if (filePath != null && !filePath.isEmpty()) {
-                mediaPlayer.setDataSource(filePath);
-                mediaPlayer.prepare();
-                mediaPlayer.start();
-
-                // Set the state to PLAYING
-                state = Audiobook.AudiobookPlayerState.PLAYING;
-                Toast.makeText(context, "Playing: " + audiobook.getTitle(), Toast.LENGTH_SHORT).show();
-            } else {
-                state = Audiobook.AudiobookPlayerState.ERROR;  // Set state to ERROR if file path is invalid
-                Toast.makeText(context, "Invalid file path.", Toast.LENGTH_SHORT).show();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            state = Audiobook.AudiobookPlayerState.ERROR;  // Set state to ERROR if something goes wrong
-            Toast.makeText(context, "Error playing audiobook.", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    // Method to pause playing
-    private void pausePlaying(Context context) {
-        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
-            state = Audiobook.AudiobookPlayerState.PAUSED;  // Set state to PAUSED
-            Toast.makeText(context, "Paused", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    // Method to stop playing
-    private void stopPlaying(Context context) {
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
-            state = Audiobook.AudiobookPlayerState.STOPPED;  // Set state to STOPPED
-            Toast.makeText(context, "Stopped", Toast.LENGTH_SHORT).show();
-        }
-    }
-
 }

@@ -80,17 +80,17 @@ public class AudiobookList extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Initialize the adapter and set it to the RecyclerView
-        AudiobookPlayer adapter = new AudiobookPlayer(audiobookList, new AudiobookPlayer.OnAudiobookClickListener() {
+        AudiobookPlayer player = new AudiobookPlayer(audiobookList, new AudiobookPlayer.OnAudiobookClickListener() {
             @Override
             public void onAudiobookClick(Audiobook audiobook) {
                 // Set the selected audiobook
                 selectedAudiobook = audiobook;
                 loadAudiobook(audiobook.getFilePath());  // Load the selected audiobook
-                mediaPlayer.start();  // Start playing the audiobook
+                // mediaPlayer.start();  // Start playing the audiobook
             }
         });
 
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(player);
         checkAndRequestPermissions();
     }
 
