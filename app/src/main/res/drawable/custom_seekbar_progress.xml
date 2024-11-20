@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background Track -->
+    <item>
+        <shape android:shape="rectangle">
+            <size android:height="10dp" /> <!-- Thickness of the background -->
+            <solid android:color="#4DFFFFFF" /> <!-- Background color -->
+        </shape>
+    </item>
+
+    <!-- Progress -->
+    <item>
+        <clip>
+            <shape android:shape="rectangle">
+                <size android:height="10dp" /> <!-- Thickness of the progress -->
+                <solid android:color="#6200EE" /> <!-- Progress color -->
+            </shape>
+        </clip>
+    </item>
+</layer-list>

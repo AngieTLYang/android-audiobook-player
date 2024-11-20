@@ -6,9 +6,6 @@ import android.os.Bundle;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.widget.Toast;
-import android.widget.TextView;
-import android.widget.ImageButton;
-import android.widget.SeekBar;
 import android.util.Log;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -25,7 +22,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.io.File;
 
-public class MainActivity extends AppCompatActivity {
+public class AudiobookList extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private Audiobook selectedAudiobook;
     private Handler handler;
@@ -40,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.audiobook_list);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -108,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 new AlertDialog.Builder(this)
                         .setTitle("Permission needed")
                         .setMessage("This permission is needed to access the music files on your device.")
-                        .setPositiveButton("OK", (dialog, which) -> ActivityCompat.requestPermissions(MainActivity.this,
+                        .setPositiveButton("OK", (dialog, which) -> ActivityCompat.requestPermissions(AudiobookList.this,
                                 new String[]{Manifest.permission.READ_MEDIA_AUDIO},
                                 MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO))
                         .create()
@@ -135,14 +132,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
+/*
     private void onAudiobookItemClick(Audiobook audiobook) {
         // Load the audiobook when the item is clicked
         loadAudiobook(audiobook.getFilePath());
     }
-
+*/
     private void loadAudiobook(String filePath) {
         // Load the audiobook using the file path
         audiobookPlayer.load(filePath, 1); // Assuming this method exists in your AudiobookPlayer class
     }
+
 }

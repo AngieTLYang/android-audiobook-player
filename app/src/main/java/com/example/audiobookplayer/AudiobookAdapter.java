@@ -23,7 +23,6 @@ public class AudiobookAdapter extends RecyclerView.Adapter<AudiobookAdapter.Audi
     private Context context;
     private MediaPlayer mediaPlayer;
     private OnAudiobookClickListener listener; // Listener for item clicks
-    private int currentPosition = 0;
     // Interface to handle audiobook play button clicks
     public interface OnAudiobookClickListener {
         void onAudiobookClick(Audiobook audiobook);
@@ -125,8 +124,40 @@ public class AudiobookAdapter extends RecyclerView.Adapter<AudiobookAdapter.Audi
         });
 
         holder.btnSkip.setOnClickListener(v -> {
-            // Handle skip button click
-            Toast.makeText(v.getContext(), "Skipped: " + audiobook.getTitle(), Toast.LENGTH_SHORT).show();
+            if (mediaPlayer != null) {
+                mediaPlayer.stop();
+                mediaPlayer.release();
+                mediaPlayer = null; // Release the current MediaPlayer
+            }
+
+            // Get the next audiobook position
+            int nextPosition = position + 1;
+
+            // Check if the next position is within bounds
+            if (nextPosition < audiobookList.size()) {
+                Audiobook nextAudiobook = audiobookList.get(nextPosition);
+
+                try {
+                    mediaPlayer = new MediaPlayer();
+                    String filePath = nextAudiobook.getFilePath();
+
+                    if (filePath != null && !filePath.isEmpty()) {
+                        mediaPlayer.setDataSource(filePath); // Set the next audiobook file
+                        mediaPlayer.prepare();
+                        mediaPlayer.start();
+
+                        Toast.makeText(v.getContext(), "Playing: " + nextAudiobook.getTitle(), Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(v.getContext(), "Invalid file path for the next audiobook.", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(v.getContext(), "Error playing the next audiobook.", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                // If there are no more audiobooks, show a message
+                Toast.makeText(v.getContext(), "No more audiobooks to skip to.", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 

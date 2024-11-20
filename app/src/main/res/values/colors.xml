@@ -2,4 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- SeekBar -->
+    <color name="seekBarThumb">#FFFFC107</color> <!-- Amber -->
+    <color name="seekBarProgress">#6200EE</color> <!-- Purple -->
+    <color name="seekBarBackground">#ffFFFFff</color> <!-- Transparent White -->
 </resources>
