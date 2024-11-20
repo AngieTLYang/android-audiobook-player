@@ -1,12 +1,17 @@
 package com.example.audiobookplayer;
+import static com.example.audiobookplayer.Audiobook.loadBookmark;
+import static com.example.audiobookplayer.Audiobook.saveBookmark;
+import android.content.SharedPreferences;
 import android.media.AudioAttributes;
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -17,11 +22,12 @@ import java.util.List;
 
 public class AudiobookPlayer extends RecyclerView.Adapter<AudiobookPlayer.AudiobookViewHolder> {
     private long savedPosition = 0; // Save the position when paused or stopped
-    private Audiobook.AudiobookPlayerState state;
+    // private Audiobook.AudiobookPlayerState state;
     private List<Audiobook> audiobookList; // List of audiobooks
-    private MediaPlayer mediaPlayer;
     private OnAudiobookClickListener listener; // Listener for item clicks
-
+    private BookmarkManager bookmarkManager;
+    private MediaPlayer mediaPlayer;
+    private Handler handler;
     // Interface to handle audiobook play button clicks
     public interface OnAudiobookClickListener {
         void onAudiobookClick(Audiobook audiobook);
@@ -31,6 +37,7 @@ public class AudiobookPlayer extends RecyclerView.Adapter<AudiobookPlayer.Audiob
     public AudiobookPlayer(List<Audiobook> audiobookList, OnAudiobookClickListener listener) {
         this.audiobookList = audiobookList;
         this.listener = listener;
+        this.handler = new Handler();
     }
 
     // Inflate the item layout and create a ViewHolder
@@ -49,10 +56,11 @@ public class AudiobookPlayer extends RecyclerView.Adapter<AudiobookPlayer.Audiob
         // Set title and author
         holder.tvTitle.setText(audiobook.getTitle());
         holder.tvAuthor.setText(audiobook.getAuthor());
-
+        Context context = holder.itemView.getContext();
+        this.bookmarkManager = new BookmarkManager(context);
+        this.bookmarkManager.open();
         // Load the saved bookmark position for this audiobook
-        savedPosition = Audiobook.loadBookmark(holder.itemView.getContext(), audiobook.getFilePath());
-
+        savedPosition = loadBookmark(holder.itemView.getContext(), audiobook.getFilePath());
         // Handle Play Button
         holder.btnPlay.setOnClickListener(v -> {
             if (mediaPlayer != null) {
@@ -77,8 +85,19 @@ Call reset() if you're planning to reuse the same MediaPlayer instance but just 
                     mediaPlayer.start();  // Start the playback
 
                     // Seek to saved bookmark position if available (cast long to int)
-                    mediaPlayer.seekTo((int) savedPosition);
-
+                    // mediaPlayer.seekTo((int) savedPosition);
+                    mediaPlayer.seekTo((int) bookmarkManager.loadBookmark(filePath)); // Load saved position
+                    int duration = mediaPlayer.getDuration();
+                    holder.seekBar.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                                int currentPosition = mediaPlayer.getCurrentPosition();
+                                holder.seekBar.setProgress(currentPosition);
+                                holder.seekBar.postDelayed(this, 1000); // Update every second
+                            }
+                        }
+                    }, 1000);
                     // Show Toast message
                     Toast.makeText(v.getContext(), "Playing: " + audiobook.getTitle(), Toast.LENGTH_SHORT).show();
                 } else {
@@ -94,10 +113,8 @@ Call reset() if you're planning to reuse the same MediaPlayer instance but just 
         holder.btnPause.setOnClickListener(v -> {
             if (mediaPlayer != null && mediaPlayer.isPlaying()) {
                 savedPosition = mediaPlayer.getCurrentPosition(); // Save current position
-                Audiobook currentAudiobook = audiobookList.get(position);
-                currentAudiobook.setBookmarkPosition(savedPosition); // Set the bookmark for current audiobook
-                currentAudiobook.saveBookmark(v.getContext()); // Save bookmark to SharedPreferences
-
+                // saveBookmark(v.getContext(), audiobook.getFilePath(), savedPosition); // Save bookmark
+                bookmarkManager.saveBookmark(audiobook.getFilePath(), savedPosition); // Save position
                 mediaPlayer.pause();
                 Toast.makeText(v.getContext(), "Paused: " + audiobook.getTitle(), Toast.LENGTH_SHORT).show();
             }
@@ -107,10 +124,8 @@ Call reset() if you're planning to reuse the same MediaPlayer instance but just 
         holder.btnStop.setOnClickListener(v -> {
             if (mediaPlayer != null) {
                 savedPosition = 0; // Set the position to 0 (start of the track)
-                Audiobook currentAudiobook = audiobookList.get(position);
-                currentAudiobook.setBookmarkPosition(savedPosition); // Set the bookmark for current audiobook
-                currentAudiobook.saveBookmark(v.getContext()); // Save bookmark to SharedPreferences
-
+                //saveBookmark(v.getContext(), audiobook.getFilePath(), savedPosition); // Save bookmark
+                bookmarkManager.saveBookmark(audiobook.getFilePath(), savedPosition); // Save position
                 mediaPlayer.stop();
                 mediaPlayer.release();
                 mediaPlayer = null;
@@ -120,6 +135,8 @@ Call reset() if you're planning to reuse the same MediaPlayer instance but just 
 
         holder.btnSkip.setOnClickListener(v -> {
             if (mediaPlayer != null) {
+                //saveBookmark(v.getContext(), audiobookList.get(position).getFilePath(), mediaPlayer.getCurrentPosition());
+                bookmarkManager.saveBookmark(audiobook.getFilePath(), savedPosition); // Save position
                 mediaPlayer.stop();
                 mediaPlayer.release();
                 mediaPlayer = null; // Release the current MediaPlayer
@@ -139,8 +156,10 @@ Call reset() if you're planning to reuse the same MediaPlayer instance but just 
                     if (filePath != null && !filePath.isEmpty()) {
                         mediaPlayer.setDataSource(filePath); // Set the next audiobook file
                         mediaPlayer.prepare();
+                        // Load the saved bookmark for the next audiobook, if available
+                        long savedPosition = loadBookmark(v.getContext(), filePath);
+                        mediaPlayer.seekTo((int) savedPosition); // Seek to the saved position (or 0 if no bookmark)
                         mediaPlayer.start();
-
                         Toast.makeText(v.getContext(), "Playing: " + nextAudiobook.getTitle(), Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(v.getContext(), "Invalid file path for the next audiobook.", Toast.LENGTH_SHORT).show();
@@ -153,6 +172,20 @@ Call reset() if you're planning to reuse the same MediaPlayer instance but just 
                 // If there are no more audiobooks, show a message
                 Toast.makeText(v.getContext(), "No more audiobooks to skip to.", Toast.LENGTH_SHORT).show();
             }
+        });
+        holder.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser && mediaPlayer != null) {
+                    mediaPlayer.seekTo(progress);  // Seek to the new position
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
     }
 
@@ -177,7 +210,7 @@ Call reset() if you're planning to reuse the same MediaPlayer instance but just 
         } catch (IOException | IllegalArgumentException e) {
             Log.e("AudiobookPlayer", "Error loading audiobook: " + e.toString());
             e.printStackTrace();
-            state = Audiobook.AudiobookPlayerState.ERROR;
+            // state = Audiobook.AudiobookPlayerState.ERROR;
         }
     }
 
@@ -186,6 +219,7 @@ Call reset() if you're planning to reuse the same MediaPlayer instance but just 
         TextView tvTitle;
         TextView tvAuthor;
         ImageButton btnPlay, btnPause, btnStop, btnSkip;
+        SeekBar seekBar;
         public AudiobookViewHolder(@NonNull View itemView) {
             super(itemView);
             // Initialize views
@@ -195,6 +229,7 @@ Call reset() if you're planning to reuse the same MediaPlayer instance but just 
             btnPause = itemView.findViewById(R.id.btnPause);
             btnStop = itemView.findViewById(R.id.btnStop);
             btnSkip = itemView.findViewById(R.id.btnSkip);
+            seekBar = itemView.findViewById(R.id.seekBar);
         }
     }
 }

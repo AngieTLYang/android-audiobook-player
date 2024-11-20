@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.media.MediaPlayer;
 import android.os.Handler;
+import android.widget.SeekBar;
 import android.widget.Toast;
 import android.util.Log;
 import androidx.activity.EdgeToEdge;
@@ -26,6 +27,7 @@ public class AudiobookList extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private Audiobook selectedAudiobook;
     private Handler handler;
+    private SeekBar seekBar;
     private Runnable updateSeekbarRunnable;
     private RecyclerView recyclerView;
     private AudiobookPlayer adapter;
@@ -84,8 +86,11 @@ public class AudiobookList extends AppCompatActivity {
             @Override
             public void onAudiobookClick(Audiobook audiobook) {
                 // Set the selected audiobook
-                selectedAudiobook = audiobook;
+                // selectedAudiobook = audiobook;
                 loadAudiobook(audiobook.getFilePath());  // Load the selected audiobook
+                DatabaseHelper dbHelper = new DatabaseHelper(AudiobookList.this);
+                long savedPosition = dbHelper.getBookmark(audiobook.getFilePath()); // Query the database
+                mediaPlayer.seekTo((int) savedPosition); // Resume from the saved position
                 // mediaPlayer.start();  // Start playing the audiobook
             }
         });
