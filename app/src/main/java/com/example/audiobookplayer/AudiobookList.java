@@ -28,9 +28,8 @@ public class AudiobookList extends AppCompatActivity {
     private Handler handler;
     private Runnable updateSeekbarRunnable;
     private RecyclerView recyclerView;
-    private AudiobookAdapter adapter;
+    private AudiobookPlayer adapter;
     private List<Audiobook> audiobookList;
-    private AudiobookPlayer audiobookPlayer;
     private static final int MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO = 1;
 
     @Override
@@ -81,7 +80,7 @@ public class AudiobookList extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Initialize the adapter and set it to the RecyclerView
-        AudiobookAdapter adapter = new AudiobookAdapter(audiobookList, new AudiobookAdapter.OnAudiobookClickListener() {
+        AudiobookPlayer adapter = new AudiobookPlayer(audiobookList, new AudiobookPlayer.OnAudiobookClickListener() {
             @Override
             public void onAudiobookClick(Audiobook audiobook) {
                 // Set the selected audiobook
@@ -92,8 +91,6 @@ public class AudiobookList extends AppCompatActivity {
         });
 
         recyclerView.setAdapter(adapter);
-
-        audiobookPlayer = new AudiobookPlayer();
         checkAndRequestPermissions();
     }
 
@@ -140,7 +137,7 @@ public class AudiobookList extends AppCompatActivity {
 */
     private void loadAudiobook(String filePath) {
         // Load the audiobook using the file path
-        audiobookPlayer.load(filePath, 1); // Assuming this method exists in your AudiobookPlayer class
+        adapter.load(filePath, 1); // Assuming this method exists in your AudiobookPlayer class
     }
 
 }

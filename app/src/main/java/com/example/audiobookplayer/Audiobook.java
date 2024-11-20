@@ -7,12 +7,29 @@ public class Audiobook {
     private String author;
     private String filePath;
     private long bookmarkPosition;
-
+    // Enum to represent player states
+    public enum AudiobookPlayerState {
+        ERROR,
+        PLAYING,
+        PAUSED,
+        STOPPED
+    }
+    private AudiobookPlayerState state;
     public Audiobook(String title, String author, String filePath, long bookmarkPosition) {
         this.title = title;
         this.author = author;
         this.filePath = filePath;
         this.bookmarkPosition = bookmarkPosition;
+        this.state = AudiobookPlayerState.STOPPED;
+    }
+
+    // Getter and Setter for the player state
+    public AudiobookPlayerState getState() {
+        return state;
+    }
+
+    public void setState(AudiobookPlayerState state) {
+        this.state = state;
     }
 
     public String getTitle() {
