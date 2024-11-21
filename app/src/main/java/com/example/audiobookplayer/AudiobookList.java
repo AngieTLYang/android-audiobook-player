@@ -1,11 +1,12 @@
 package com.example.audiobookplayer;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.media.MediaPlayer;
 import android.os.Handler;
-import android.widget.SeekBar;
+import android.widget.Button;
 import android.widget.Toast;
 import android.util.Log;
 import androidx.activity.EdgeToEdge;
@@ -25,14 +26,12 @@ import java.io.File;
 
 public class AudiobookList extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
-    private Audiobook selectedAudiobook;
     private Handler handler;
-    private SeekBar seekBar;
-    private Runnable updateSeekbarRunnable;
     private RecyclerView recyclerView;
     private AudiobookPlayer adapter;
     private List<Audiobook> audiobookList;
     private static final int MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO = 1;
+    private Button settingButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +68,7 @@ public class AudiobookList extends AppCompatActivity {
                             String title = parts[1].trim(); // Title part after " - "
 
                             // Create an Audiobook object and add it to the list
-                            Audiobook audiobook = new Audiobook(author, title, file.getPath(), 0L);
+                            Audiobook audiobook = new Audiobook(title, author, file.getPath(), 0L);
                             audiobookList.add(audiobook);
                         }
                     }
@@ -97,6 +96,19 @@ public class AudiobookList extends AppCompatActivity {
 
         recyclerView.setAdapter(player);
         checkAndRequestPermissions();
+
+        // Initialize the button
+        settingButton = findViewById(R.id.setting_button);
+
+        // Set the click listener for the setting button
+        settingButton.setOnClickListener(v -> {
+            Log.d("button click", "setOnClickListener");
+            Toast.makeText(AudiobookList.this, "Button Clicked", Toast.LENGTH_SHORT).show();
+            // Start the SettingsActivity when the button is clicked
+            Intent intent = new Intent(AudiobookList.this, SettingsActivity.class);
+            startActivity(intent);
+        });
+
     }
 
     private void checkAndRequestPermissions() {

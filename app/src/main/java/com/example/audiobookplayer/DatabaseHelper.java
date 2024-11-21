@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
     // Database name and version
     private static final String DATABASE_NAME = "audiobooks.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     // Table name and columns
     public static final String TABLE_BOOKMARKS = "bookmarks";

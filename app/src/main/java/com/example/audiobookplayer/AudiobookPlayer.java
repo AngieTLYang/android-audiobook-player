@@ -83,11 +83,12 @@ Call reset() if you're planning to reuse the same MediaPlayer instance but just 
                     mediaPlayer.setDataSource(filePath);  // Set file path for new audiobook
                     mediaPlayer.prepare();  // Prepare the MediaPlayer
                     mediaPlayer.start();  // Start the playback
-
+                    holder.seekBar.setMax(mediaPlayer.getDuration()); // Set the maximum duration
+                    holder.seekBar.setProgress(mediaPlayer.getCurrentPosition()); // Set initial progress
                     // Seek to saved bookmark position if available (cast long to int)
                     // mediaPlayer.seekTo((int) savedPosition);
                     mediaPlayer.seekTo((int) bookmarkManager.loadBookmark(filePath)); // Load saved position
-                    int duration = mediaPlayer.getDuration();
+                    // int duration = mediaPlayer.getDuration();
                     holder.seekBar.postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -228,7 +229,7 @@ Call reset() if you're planning to reuse the same MediaPlayer instance but just 
             btnPlay = itemView.findViewById(R.id.btnPlay);
             btnPause = itemView.findViewById(R.id.btnPause);
             btnStop = itemView.findViewById(R.id.btnStop);
-            btnSkip = itemView.findViewById(R.id.btnSkip);
+            btnSkip = itemView.findViewById(R.id.btnNext);
             seekBar = itemView.findViewById(R.id.seekBar);
         }
     }

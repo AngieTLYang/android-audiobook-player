@@ -8,8 +8,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cardView"
         android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:layout_margin="10dp"
+        android:layout_height="240dp"
+        android:layout_margin="18dp"
         android:background="#000000"
         app:cardCornerRadius="8dp"
         app:cardElevation="4dp"
@@ -28,7 +28,7 @@
             android:layout_width="197dp"
             android:layout_height="72dp"
             android:layout_marginStart="19dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="195dp"
             android:layout_marginBottom="62dp"
             android:text="@string/title"
@@ -58,8 +58,8 @@
 
         <ImageButton
             android:id="@+id/btnPlay"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_marginStart="16dp"
             android:contentDescription="@string/play_button_description"
             android:scaleType="fitCenter"
@@ -72,8 +72,8 @@
         <!-- Pause Button -->
         <ImageButton
             android:id="@+id/btnPause"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_marginStart="16dp"
             android:contentDescription="@string/pause_button_description"
             android:scaleType="fitCenter"
@@ -86,29 +86,42 @@
         <!-- Stop Button -->
         <ImageButton
             android:id="@+id/btnStop"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_marginStart="16dp"
             android:contentDescription="@string/stop_button_description"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_stop"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btnSkip"
+            app:layout_constraintEnd_toStartOf="@id/btnPrev"
             app:layout_constraintStart_toEndOf="@id/btnPause"
             app:layout_constraintTop_toBottomOf="@id/tvAuthor" />
 
-        <!-- Skip Button -->
+        <!-- Previous Button -->
         <ImageButton
-            android:id="@+id/btnSkip"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:id="@+id/btnPrev"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_marginStart="16dp"
-            android:contentDescription="@string/fast_forward_button_description"
+            android:contentDescription="@string/previous_button_description"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_skip"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/btnStop"
+            app:layout_constraintTop_toBottomOf="@id/tvAuthor" />
+        <!-- Next Button -->
+        <ImageButton
+            android:id="@+id/btnNext"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="16dp"
+            android:contentDescription="@string/next_button_description"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_skip"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/btnPrev"
             app:layout_constraintTop_toBottomOf="@id/tvAuthor" />
 
         <SeekBar

@@ -1,9 +1,17 @@
 <resources>
     <string name="app_name">Audiobook player</string>
+    <string name="setting_button">Setting</string>
     <string name="title">Title</string>
     <string name="author">Author</string>
     <string name="play_button_description">Play</string>
     <string name="pause_button_description">Pause</string>
     <string name="stop_button_description">Stop</string>
-    <string name="fast_forward_button_description">Skip Forward</string>
+    <string name="previous_button_description">Previous audio</string>
+    <string name="next_button_description">Next audio</string>
+    <string-array name="playback_speeds">
+        <item>0.5x</item>
+        <item>1.0x (Normal)</item>
+        <item>1.5x</item>
+        <item>2.0x</item>
+    </string-array>
 </resources>
