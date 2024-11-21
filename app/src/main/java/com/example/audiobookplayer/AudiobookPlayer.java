@@ -61,6 +61,7 @@ public class AudiobookPlayer extends RecyclerView.Adapter<AudiobookPlayer.Audiob
         this.bookmarkManager.open();
         // Load the saved bookmark position for this audiobook
         savedPosition = loadBookmark(holder.itemView.getContext(), audiobook.getFilePath());
+
         // Handle Play Button
         holder.btnPlay.setOnClickListener(v -> {
             if (mediaPlayer != null) {

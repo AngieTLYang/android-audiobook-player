@@ -1,6 +1,7 @@
 package com.example.audiobookplayer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,6 +45,14 @@ public class SettingsActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedSpeed = parent.getItemAtPosition(position).toString();
                 Log.d("speed spinner interaction", selectedSpeed + "was selected");
+                // Convert the selected speed to a float (for MediaPlayer)
+                float playbackSpeed = Float.parseFloat(selectedSpeed);
+
+                // Save it in SharedPreferences
+                SharedPreferences sharedPref = getSharedPreferences("settings", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putFloat("selectedSpeed", playbackSpeed);
+                editor.apply();
                 // Handle speed changes, e.g., send it back to the main activity
             }
 
@@ -75,6 +84,10 @@ public class SettingsActivity extends AppCompatActivity {
                 ConstraintLayout cardView = findViewById(R.id.cardView);
                 cardView.setBackgroundColor(selectedColor);  // Apply the selected color
                 Log.d("color picker interaction", selectedColor + "was selected");
+                SharedPreferences sharedPref = getSharedPreferences("settings", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putInt("selectedColor", selectedColor);
+                editor.apply();
             });
 
             // Show the dialog
