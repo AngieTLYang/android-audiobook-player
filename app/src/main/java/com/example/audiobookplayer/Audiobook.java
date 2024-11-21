@@ -1,12 +1,14 @@
 package com.example.audiobookplayer;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-public class Audiobook {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Audiobook implements Parcelable {
     private String title;
     private String author;
     private String filePath;
     private long bookmarkPosition;
+
     // Enum to represent player states
     public enum AudiobookPlayerState {
         ERROR,
@@ -14,13 +16,24 @@ public class Audiobook {
         PAUSED,
         STOPPED
     }
+
     private AudiobookPlayerState state;
+
     public Audiobook(String title, String author, String filePath, long bookmarkPosition) {
         this.title = title;
         this.author = author;
         this.filePath = filePath;
         this.bookmarkPosition = bookmarkPosition;
         this.state = AudiobookPlayerState.STOPPED;
+    }
+
+    // Constructor used for Parcel
+    protected Audiobook(Parcel in) {
+        title = in.readString();
+        author = in.readString();
+        filePath = in.readString();
+        bookmarkPosition = in.readLong();
+        state = AudiobookPlayerState.values()[in.readInt()]; // Read the state from the Parcel
     }
 
     // Getter and Setter for the player state
@@ -45,29 +58,38 @@ public class Audiobook {
     }
 
     public long getBookmarkPosition() {
-        return bookmarkPosition;  // Get the bookmark position
+        return bookmarkPosition;
     }
 
     public void setBookmarkPosition(long bookmarkPosition) {
-        this.bookmarkPosition = bookmarkPosition;  // Set the bookmark position
-    }
-    // Save the bookmark position to SharedPreferences
-    public static void saveBookmark(Context context, String filePath, long position) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("AudiobookPreferences", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        // Ensure filePath is sanitized for storage, if necessary
-        // String key = "bookmark_" + this.getFilePath();
-        // editor.putLong(key, this.getBookmarkPosition());
-        editor.putLong(filePath, position);
-        editor.apply(); // Apply the changes asynchronously
+        this.bookmarkPosition = bookmarkPosition;
     }
 
-    // Load the bookmark position from SharedPreferences
-    public static long loadBookmark(Context context, String filePath) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("AudiobookPreferences", Context.MODE_PRIVATE);
-        //String key = "bookmark_" + filePath; // Ensure the key format is the same as when saving
-        //return sharedPreferences.getLong(key, 0);  // Default to 0 if no bookmark is saved
-        return sharedPreferences.getLong(filePath, 0);
+    // Implement the writeToParcel method
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeString(author);
+        dest.writeString(filePath);
+        dest.writeLong(bookmarkPosition);
+        dest.writeInt(state.ordinal()); // Write the state (ordinal) to the Parcel
     }
+
+    @Override
+    public int describeContents() {
+        return 0;  // No special contents to describe
+    }
+
+    // Creator for Parcelable
+    public static final Creator<Audiobook> CREATOR = new Creator<Audiobook>() {
+        @Override
+        public Audiobook createFromParcel(Parcel in) {
+            return new Audiobook(in);
+        }
+
+        @Override
+        public Audiobook[] newArray(int size) {
+            return new Audiobook[size];
+        }
+    };
 }

@@ -24,20 +24,20 @@ import java.util.List;
 import java.util.ArrayList;
 import java.io.File;
 
-public class AudiobookList extends AppCompatActivity {
+public class AudiobookListActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private Handler handler;
     private RecyclerView recyclerView;
-    private AudiobookPlayer adapter;
-    private List<Audiobook> audiobookList;
+    private AudiobookPlayerAdapter adapter;
+    private List<Audiobook> audiobookList = new ArrayList<>();
     private static final int MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO = 1;
     private Button settingButton;
-
+    ArrayList<Audiobook> arrayList = new ArrayList<>(audiobookList);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.audiobook_list);
+        setContentView(R.layout.activity_audiobook_list);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -80,21 +80,28 @@ public class AudiobookList extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Initialize the adapter and set it to the RecyclerView
-        AudiobookPlayer player = new AudiobookPlayer(audiobookList, new AudiobookPlayer.OnAudiobookClickListener() {
+        // Initialize adapter and handle audiobook clicks
+        adapter = new AudiobookPlayerAdapter(audiobookList, new AudiobookPlayerAdapter.OnAudiobookClickListener() {
             @Override
             public void onAudiobookClick(Audiobook audiobook) {
-                // Set the selected audiobook
-                // selectedAudiobook = audiobook;
-                loadAudiobook(audiobook.getFilePath());  // Load the selected audiobook
-                DatabaseHelper dbHelper = new DatabaseHelper(AudiobookList.this);
-                long savedPosition = dbHelper.getBookmark(audiobook.getFilePath()); // Query the database
-                mediaPlayer.seekTo((int) savedPosition); // Resume from the saved position
-                // mediaPlayer.start();  // Start playing the audiobook
+                int position = audiobookList.indexOf(audiobook);
+                // Pass the audiobook details to AudiobookPlayerActivity
+                Log.d("AudiobookPlayer", "Title: " + audiobook.getTitle() + ", Author: " + audiobook.getAuthor() + ", FilePath: " + audiobook.getFilePath());
+                Intent intent = new Intent(AudiobookListActivity.this, AudiobookPlayerActivity.class);
+                intent.putParcelableArrayListExtra("audiobookList", new ArrayList<>(audiobookList));
+                intent.putExtra("title", audiobook.getTitle());
+                intent.putExtra("author", audiobook.getAuthor());
+                intent.putExtra("filePath", audiobook.getFilePath());
+                intent.putExtra("currentIndex", position);  // Pass the position of the audiobook
+                // Ensure these values are not null
+                if (audiobook.getTitle() == null || audiobook.getAuthor() == null || audiobook.getFilePath() == null) {
+                    throw new IllegalArgumentException("Audiobook data is missing.");
+                }
+                startActivity(intent);
             }
         });
 
-        recyclerView.setAdapter(player);
+        recyclerView.setAdapter(adapter);
         checkAndRequestPermissions();
 
         // Initialize the button
@@ -103,9 +110,9 @@ public class AudiobookList extends AppCompatActivity {
         // Set the click listener for the setting button
         settingButton.setOnClickListener(v -> {
             Log.d("button click", "setOnClickListener");
-            Toast.makeText(AudiobookList.this, "Button Clicked", Toast.LENGTH_SHORT).show();
+            Toast.makeText(AudiobookListActivity.this, "Button Clicked", Toast.LENGTH_SHORT).show();
             // Start the SettingsActivity when the button is clicked
-            Intent intent = new Intent(AudiobookList.this, SettingsActivity.class);
+            Intent intent = new Intent(AudiobookListActivity.this, SettingsActivity.class);
             startActivity(intent);
         });
 
@@ -119,7 +126,7 @@ public class AudiobookList extends AppCompatActivity {
                 new AlertDialog.Builder(this)
                         .setTitle("Permission needed")
                         .setMessage("This permission is needed to access the music files on your device.")
-                        .setPositiveButton("OK", (dialog, which) -> ActivityCompat.requestPermissions(AudiobookList.this,
+                        .setPositiveButton("OK", (dialog, which) -> ActivityCompat.requestPermissions(AudiobookListActivity.this,
                                 new String[]{Manifest.permission.READ_MEDIA_AUDIO},
                                 MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO))
                         .create()
@@ -154,7 +161,7 @@ public class AudiobookList extends AppCompatActivity {
 */
     private void loadAudiobook(String filePath) {
         // Load the audiobook using the file path
-        adapter.load(filePath, 1); // Assuming this method exists in your AudiobookPlayer class
+        adapter.load(filePath, 1); // Assuming this method exists in your AudiobookPlayerAdapter class
     }
 
 }

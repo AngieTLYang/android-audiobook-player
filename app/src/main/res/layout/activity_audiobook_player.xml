@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AudiobookPlayerActivity">
+
+    <!-- Title TextView -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Title"
+        android:textSize="60sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="200dp"/>
+
+    <!-- Author TextView -->
+    <TextView
+        android:id="@+id/tvAuthor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Author"
+        android:textSize="50sp"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="100dp"/>
+
+    <!-- SeekBar -->
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="280dp"
+        android:layout_height="30dp"
+        android:max="100"
+        android:progressDrawable="@drawable/custom_seekbar_progress"
+        android:thumb="@drawable/custom_seekbar_thumb"
+        android:thumbTint="#F101B1"
+        android:backgroundTint="@color/seekBarBackground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvTitle"
+        app:layout_constraintTop_toBottomOf="@id/tvAuthor"
+        app:layout_constraintBottom_toTopOf="@id/btnPlay"
+        android:layout_marginTop="200dp"/>
+
+    <!-- Play Button -->
+    <ImageButton
+        android:id="@+id/btnPlay"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_play"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/play_button_description"
+        app:layout_constraintTop_toBottomOf="@id/seekBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="100dp"/>
+
+    <!-- Pause Button -->
+    <ImageButton
+        android:id="@+id/btnPause"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_pause"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/pause_button_description"
+        app:layout_constraintTop_toBottomOf="@id/btnPlay"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Stop Button -->
+    <ImageButton
+        android:id="@+id/btnStop"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_stop"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/stop_button_description"
+        app:layout_constraintTop_toBottomOf="@id/btnPause"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Skip Button -->
+    <ImageButton
+        android:id="@+id/btnPrev"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_prev"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/previous_button_description"
+        app:layout_constraintTop_toBottomOf="@id/btnStop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Skip Button -->
+    <ImageButton
+        android:id="@+id/btnNext"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_next"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/next_button_description"
+        app:layout_constraintTop_toBottomOf="@id/btnPrev"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
