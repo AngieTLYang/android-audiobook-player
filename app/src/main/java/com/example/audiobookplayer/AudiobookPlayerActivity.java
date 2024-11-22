@@ -25,7 +25,7 @@ public class AudiobookPlayerActivity extends AppCompatActivity {
     private boolean isBound = false;
     private BookmarkManager bookmarkManager; // Declare the bookmarkManager
 
-    private TextView tvTitle, tvAuthor;
+    private TextView tvTitle, tvAuthor, tvBookmarkTimestamp;
     private ImageButton btnPlayFromBookmark, btnPlay, btnPause, btnStop, btnPrev, btnNext, btnBookmark;
     private SeekBar seekBar;
 
@@ -48,6 +48,7 @@ public class AudiobookPlayerActivity extends AppCompatActivity {
         btnPrev = findViewById(R.id.btnPrev);
         btnNext = findViewById(R.id.btnNext);
         seekBar = findViewById(R.id.seekBar);
+        tvBookmarkTimestamp = findViewById(R.id.tvBookmarkTimestamp);
 
         // Initialize bookmark manager
         bookmarkManager = new BookmarkManager(this);
@@ -70,6 +71,7 @@ public class AudiobookPlayerActivity extends AppCompatActivity {
         btnBookmark.setOnClickListener(v -> {
             currentPosition.set(seekBar.getProgress());
             bookmarkManager.saveBookmark(currentFilePath, currentPosition.get());
+            updateBookmarkTimestamp(currentPosition.get());
             Toast.makeText(AudiobookPlayerActivity.this, "Bookmark saved!", Toast.LENGTH_SHORT).show();
         });
 
@@ -183,7 +185,16 @@ public class AudiobookPlayerActivity extends AppCompatActivity {
             isBound = false;
         }
     };
-
+    private void updateBookmarkTimestamp(long timestamp) {
+        String formattedTime = formatTime(timestamp);
+        tvBookmarkTimestamp.setText(formattedTime);
+    }
+    private String formatTime(long milliseconds) {
+        long seconds = (milliseconds / 1000) % 60;
+        long minutes = (milliseconds / (1000 * 60)) % 60;
+        long hours = (milliseconds / (1000 * 60 * 60)) % 24;
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
     // Update SeekBar position
     private final Runnable updateSeekBar = new Runnable() {
         @Override

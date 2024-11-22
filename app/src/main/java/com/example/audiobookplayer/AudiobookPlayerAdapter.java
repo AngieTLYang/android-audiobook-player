@@ -23,6 +23,7 @@ public class AudiobookPlayerAdapter extends RecyclerView.Adapter<AudiobookPlayer
     private List<Audiobook> audiobookList; // List of audiobooks
     private OnAudiobookClickListener listener; // Listener for item clicks
     private MediaPlayer mediaPlayer;
+    // private BookmarkManager bookmarkManager; // Declare the bookmarkManager
     // Interface to handle audiobook item clicks
     public interface OnAudiobookClickListener {
         void onAudiobookClick(Audiobook audiobook);
@@ -35,6 +36,7 @@ public class AudiobookPlayerAdapter extends RecyclerView.Adapter<AudiobookPlayer
         // Load the saved color from SharedPreferences
         SharedPreferences sharedPref = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
         this.selectedColor = sharedPref.getInt("selectedColor", Color.WHITE); // Default color is white
+        // this.bookmarkManager = bookmarkManager; // Initialize it
     }
 
     // Inflate the item layout and create a ViewHolder
@@ -54,6 +56,14 @@ public class AudiobookPlayerAdapter extends RecyclerView.Adapter<AudiobookPlayer
         holder.tvTitle.setText(audiobook.getTitle());
         holder.tvAuthor.setText(audiobook.getAuthor());
 
+        // Retrieve saved position from bookmark manager
+        String filePath = audiobook.getFilePath(); // Ensure Audiobook has a method to get file path
+        // long savedPosition = bookmarkManager.loadBookmark(filePath); // Load saved bookmark position
+
+        // Format saved position to a timestamp (HH:mm:ss) and set it in a TextView
+        // String formattedTimestamp = formatTime(savedPosition);
+        //holder.tvBookmarkTimestamp.setText(formattedTimestamp); // tvTimestamp should be defined in the ViewHolder
+
         // Set background color of cardView
         if (holder.cardView != null) {
             holder.cardView.setBackgroundColor(selectedColor);
@@ -68,6 +78,15 @@ public class AudiobookPlayerAdapter extends RecyclerView.Adapter<AudiobookPlayer
             }
         });
     }
+
+    // Utility method to format milliseconds to HH:mm:ss
+    private String formatTime(long milliseconds) {
+        long seconds = (milliseconds / 1000) % 60;
+        long minutes = (milliseconds / (1000 * 60)) % 60;
+        long hours = (milliseconds / (1000 * 60 * 60)) % 24;
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
     public void updateColor(int color) {
         this.selectedColor = color;
         notifyDataSetChanged(); // Refresh the list to apply the new color
@@ -81,8 +100,7 @@ public class AudiobookPlayerAdapter extends RecyclerView.Adapter<AudiobookPlayer
 
     // ViewHolder to represent each item in the list
     public static class AudiobookViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTitle;
-        TextView tvAuthor;
+        TextView tvTitle, tvAuthor, tvBookmarkTimestamp;
         ConstraintLayout cardView;
         public AudiobookViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -90,6 +108,7 @@ public class AudiobookPlayerAdapter extends RecyclerView.Adapter<AudiobookPlayer
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvAuthor = itemView.findViewById(R.id.tvAuthor);
             cardView = itemView.findViewById(R.id.cardView);
+            tvBookmarkTimestamp = itemView.findViewById(R.id.tvBookmarkTimestamp);
         }
     }
     public void load(String filePath, float speed) {
