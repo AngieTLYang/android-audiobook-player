@@ -2,6 +2,7 @@ package com.example.audiobookplayer;
 
 import android.content.Intent;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -9,8 +10,10 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +33,8 @@ public class AudiobookPlayerActivity extends AppCompatActivity {
     private ImageButton btnPlay, btnPause, btnStop, btnPrev, btnNext;
     String title, author, filePath;
     private int currentIndex;
+    private float playbackSpeed = 1.0f;  // Default playback speed
+    private float previousSpeed = -1.0f; // Initially set to a value that's not the default
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +49,12 @@ public class AudiobookPlayerActivity extends AppCompatActivity {
         btnPrev = findViewById(R.id.btnPrev);
         btnNext = findViewById(R.id.btnNext);
         seekBar = findViewById(R.id.seekBar);
+
+        // Retrieve the saved playback speed from SharedPreferences
+        SharedPreferences sharedPref = getSharedPreferences("settings", MODE_PRIVATE);
+        playbackSpeed = sharedPref.getFloat("selectedSpeed", 1.0f);  // Default to 1.0 if not set
+        Log.d("AudiobookPlayer", "Playback speed retrieved: " + playbackSpeed);
+
         Intent intent = getIntent();
         audiobookList = getIntent().getParcelableArrayListExtra("audiobookList");
         if (audiobookList == null || audiobookList.isEmpty()) {
@@ -94,6 +105,12 @@ public class AudiobookPlayerActivity extends AppCompatActivity {
 
                 // Seek to saved bookmark position
                 mediaPlayer.seekTo((int) savedPosition);
+
+                // Update playback speed only when it changes
+                if (previousSpeed != playbackSpeed) {
+                    mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(playbackSpeed));
+                    previousSpeed = playbackSpeed;  // Update the previous speed
+                }
 
                 // Update the seek bar position every second
                 handler.postDelayed(new Runnable() {
