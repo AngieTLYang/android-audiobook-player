@@ -62,6 +62,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="100dp"/>
 
+    <!-- Play from Bookmark Button -->
+    <ImageButton
+        android:id="@+id/btnPlayFromBookmark"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_bookmark_black"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/play_from_bookmark_button_description"
+        app:layout_constraintTop_toTopOf="@id/btnPlay"
+        app:layout_constraintStart_toEndOf="@id/btnPlay"
+        android:layout_marginStart="16dp" />
+
     <!-- Pause Button -->
     <ImageButton
         android:id="@+id/btnPause"
@@ -110,6 +122,18 @@
         android:scaleType="fitCenter"
         android:contentDescription="@string/next_button_description"
         app:layout_constraintTop_toBottomOf="@id/btnPrev"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+    <!-- Bookmark Button -->
+    <ImageButton
+        android:id="@+id/btnBookmark"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_bookmark_white"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/bookmark_button_description"
+        app:layout_constraintTop_toBottomOf="@id/btnNext"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"/>

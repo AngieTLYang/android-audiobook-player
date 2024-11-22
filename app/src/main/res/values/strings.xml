@@ -8,6 +8,8 @@
     <string name="stop_button_description">Stop</string>
     <string name="previous_button_description">Previous audio</string>
     <string name="next_button_description">Next audio</string>
+    <string name="bookmark_button_description">Bookmark</string>
+    <string name="play_from_bookmark_button_description">Play from Bookmark</string>
     <string-array name="playback_speeds">
         <item>0.5x</item>
         <item>1.0x (Normal)</item>
