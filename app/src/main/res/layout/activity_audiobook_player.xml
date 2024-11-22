@@ -31,22 +31,25 @@
         android:layout_marginTop="100dp"/>
 
     <!-- SeekBar -->
+
+    <!-- Play Button -->
+
     <SeekBar
         android:id="@+id/seekBar"
-        android:layout_width="280dp"
+        android:layout_width="600dp"
         android:layout_height="30dp"
+        android:layout_marginTop="100dp"
+        android:backgroundTint="@color/seekBarBackground"
         android:max="100"
         android:progressDrawable="@drawable/custom_seekbar_progress"
         android:thumb="@drawable/custom_seekbar_thumb"
         android:thumbTint="#F101B1"
-        android:backgroundTint="@color/seekBarBackground"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/tvTitle"
-        app:layout_constraintTop_toBottomOf="@id/tvAuthor"
         app:layout_constraintBottom_toTopOf="@id/btnPlay"
-        android:layout_marginTop="200dp"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvAuthor" />
 
-    <!-- Play Button -->
     <ImageButton
         android:id="@+id/btnPlay"
         android:layout_width="150dp"

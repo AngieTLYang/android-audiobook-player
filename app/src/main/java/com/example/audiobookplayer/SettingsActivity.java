@@ -45,15 +45,23 @@ public class SettingsActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedSpeed = parent.getItemAtPosition(position).toString();
                 Log.d("speed spinner interaction", selectedSpeed + "was selected");
-                // Convert the selected speed to a float (for MediaPlayer)
-                float playbackSpeed = Float.parseFloat(selectedSpeed);
 
-                // Save it in SharedPreferences
-                SharedPreferences sharedPref = getSharedPreferences("settings", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putFloat("selectedSpeed", playbackSpeed);
-                editor.apply();
-                // Handle speed changes, e.g., send it back to the main activity
+                try {
+                    // Remove the "x" from the string, e.g., "0.5x" -> "0.5"
+                    String numericSpeed = selectedSpeed.replace("x", "").trim();
+
+                    // Convert the cleaned string to a float
+                    float playbackSpeed = Float.parseFloat(numericSpeed);
+
+                    // Save the speed in SharedPreferences
+                    SharedPreferences sharedPref = getSharedPreferences("settings", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putFloat("selectedSpeed", playbackSpeed);
+                    editor.apply();
+
+                } catch (NumberFormatException e) {
+                    Log.e("speed spinner error", "Invalid playback speed: " + selectedSpeed, e);
+                }
             }
 
             @Override
@@ -79,15 +87,22 @@ public class SettingsActivity extends AppCompatActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
             builder.setTitle("Pick a Color");
             builder.setItems(colorNames, (dialog, which) -> {
-                // Get the selected color and apply it
-                int selectedColor = colors[which];
-                ConstraintLayout cardView = findViewById(R.id.cardView);
-                cardView.setBackgroundColor(selectedColor);  // Apply the selected color
-                Log.d("color picker interaction", selectedColor + "was selected");
-                SharedPreferences sharedPref = getSharedPreferences("settings", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putInt("selectedColor", selectedColor);
-                editor.apply();
+                try {
+                    int selectedColor = colors[which];
+                    ConstraintLayout cardView = findViewById(R.id.cardView);
+                    if (cardView != null) {
+                        cardView.setBackgroundColor(selectedColor);
+                    } else {
+                        Log.e("SettingsActivity", "CardView is null");
+                    }
+
+                    SharedPreferences sharedPref = getSharedPreferences("settings", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putInt("selectedColor", selectedColor);
+                    editor.apply();
+                } catch (Exception e) {
+                    Log.e("SettingsActivity", "Error in color picker", e);
+                }
             });
 
             // Show the dialog
