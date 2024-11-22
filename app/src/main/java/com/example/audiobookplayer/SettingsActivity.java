@@ -1,6 +1,5 @@
 package com.example.audiobookplayer;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -9,7 +8,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import androidx.annotation.Nullable;
@@ -35,8 +33,8 @@ public class SettingsActivity extends AppCompatActivity {
 
         // Set up playback speed options
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.playback_speeds, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                R.array.playback_speeds, R.layout.item_spinner); // Use custom layout
+        adapter.setDropDownViewResource(R.layout.item_spinner); // Use custom layout for dropdown
         speedSpinner.setAdapter(adapter);
 
         // Handle spinner selection
@@ -86,25 +84,27 @@ public class SettingsActivity extends AppCompatActivity {
             // Build the dialog
             AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
             builder.setTitle("Pick a Color");
-            builder.setItems(colorNames, (dialog, which) -> {
-                try {
-                    int selectedColor = colors[which];
-                    ConstraintLayout cardView = findViewById(R.id.cardView);
-                    if (cardView != null) {
-                        cardView.setBackgroundColor(selectedColor);
-                    } else {
-                        Log.e("SettingsActivity", "CardView is null");
-                    }
 
-                    SharedPreferences sharedPref = getSharedPreferences("settings", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putInt("selectedColor", selectedColor);
-                    editor.apply();
-                } catch (Exception e) {
-                    Log.e("SettingsActivity", "Error in color picker", e);
-                }
-            });
+            // Use a custom adapter to set the layout for the color options
+            builder.setAdapter(new ArrayAdapter<String>(SettingsActivity.this, R.layout.item_color_picker, colorNames),
+                    (dialog, which) -> {
+                        try {
+                            int selectedColor = colors[which];
+                            ConstraintLayout cardView = findViewById(R.id.cardView);
+                            if (cardView != null) {
+                                cardView.setBackgroundColor(selectedColor);
+                            } else {
+                                Log.e("SettingsActivity", "CardView is null");
+                            }
 
+                            SharedPreferences sharedPref = getSharedPreferences("settings", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.putInt("selectedColor", selectedColor);
+                            editor.apply();
+                        } catch (Exception e) {
+                            Log.e("SettingsActivity", "Error in color picker", e);
+                        }
+                    });
             // Show the dialog
             builder.create().show();
         });

@@ -2,7 +2,9 @@ package com.example.audiobookplayer;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.media.MediaPlayer;
 import android.os.Handler;
@@ -99,7 +101,7 @@ public class AudiobookListActivity extends AppCompatActivity {
                 }
                 startActivity(intent);
             }
-        });
+        }, this);
 
         recyclerView.setAdapter(adapter);
         checkAndRequestPermissions();
@@ -153,15 +155,23 @@ public class AudiobookListActivity extends AppCompatActivity {
             }
         }
     }
-/*
-    private void onAudiobookItemClick(Audiobook audiobook) {
-        // Load the audiobook when the item is clicked
-        loadAudiobook(audiobook.getFilePath());
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Retrieve the selected color from SharedPreferences
+        SharedPreferences sharedPref = getSharedPreferences("settings", MODE_PRIVATE);
+        int selectedColor = sharedPref.getInt("selectedColor", Color.WHITE); // Default to white
+
+        // Update the adapter with the selected color
+        if (adapter != null) {
+            adapter.updateColor(selectedColor);
+        }
     }
-*/
+    /*
     private void loadAudiobook(String filePath) {
         // Load the audiobook using the file path
         adapter.load(filePath, 1); // Assuming this method exists in your AudiobookPlayerAdapter class
     }
-
+    */
 }
