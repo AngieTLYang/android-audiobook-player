@@ -39,18 +39,16 @@ public class AudioBookPlayerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d("AudioBookPlayerService", "Before createNotificationChannel();");
         createNotificationChannel();  // Make sure this is called
-        startForegroundService();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // Log that the service has been started
-        Log.d("AudioBookPlayerService", "Service started in foreground");
 
-        // Ensure startForegroundService is called on the main thread
-        Handler mainHandler = new Handler(Looper.getMainLooper());
-        mainHandler.post(() -> startForegroundService());  // This will run on the main thread
+        Log.d("AudioBookPlayerService", "Before onStartCommand startForegroundService();");
+        startForegroundService();
+        Log.d("AudioBookPlayerService", "After onStartCommand startForegroundService();");
 
         // Return the appropriate flag for how the service should behave after it’s finished
         return START_STICKY;  // or another appropriate flag, depending on your needs
@@ -58,13 +56,8 @@ public class AudioBookPlayerService extends Service {
 
     // Call this method to start the service in the foreground
     public void startForegroundService() {
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Audiobook Player")
-                .setContentText("Playing audiobook...")
-                .setSmallIcon(R.drawable.ic_play)
-                .build();
-
-        startForeground(1, notification);
+        Log.d("AudioBookPlayerService", "Starting foreground service...");
+        updateNotification("Playing audiobook..."); // Use default playback status
     }
 
     // Initialize the audiobook list and index (typically from Activity)
@@ -87,6 +80,8 @@ public class AudioBookPlayerService extends Service {
         try {
             Audiobook currentAudiobook = audiobookList.get(index);
             String filePath = currentAudiobook.getFilePath();
+            Log.d("AudiobookPlayer", "FilePath: " + filePath);
+            mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(filePath);
             mediaPlayer.prepareAsync(); // Prepare asynchronously
             // Set the listener for when preparation is complete
@@ -97,23 +92,24 @@ public class AudioBookPlayerService extends Service {
                 }
                 // Start playback after preparing (and seeking, if necessary)
                 mp.start();
-                showNotification("Playing audiobook...");
+                updateNotification("Playing audiobook...");
+                // Start the PlayerActivity and pass the filePath to it
+                Intent intent = new Intent(this, AudiobookPlayerActivity.class);
+                intent.putExtra("filePath", filePath);  // Pass the filePath
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);  // Start a new activity
+                startActivity(intent);  // Start the activity
             });
-            /*
-            mediaPlayer.setOnPreparedListener(mp -> {
-                mediaPlayer.start();
-                currentIndex = index;
-                showNotification("Playing audiobook...");
-            });
-            */
 
-            // Start the service in the foreground when the audiobook starts
-            startForegroundService();
+            // Start the foreground service with a default "Loading" notification
+            updateNotification("Loading audiobook...");
+            /*
             // Start the PlayerActivity and pass the filePath to it
             Intent intent = new Intent(this, AudiobookPlayerActivity.class);
             intent.putExtra("filePath", filePath);  // Pass the filePath
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);  // Start a new activity
             startActivity(intent);  // Start the activity
+            */
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -178,11 +174,9 @@ public class AudioBookPlayerService extends Service {
             mediaPlayer = null;
         }
     }
-    /**
-     * Shows the notification for the foreground service.
-     */
-    private void showNotification(String playbackStatus) {
-        Log.d("AudioBookPlayerService", "Notification being built and started");
+
+    private void updateNotification(String playbackStatus) {
+        Log.d("AudioBookPlayerService", "Updating notification: " + playbackStatus);
 
         Intent playIntent = new Intent(this, AudioBookPlayerService.class);
         playIntent.setAction("PLAY");
@@ -198,18 +192,20 @@ public class AudioBookPlayerService extends Service {
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Audiobook Player")
-                .setContentText(playbackStatus)
-                .setSmallIcon(R.drawable.ic_audiobook)
+                .setContentText(playbackStatus) // Use the dynamic playback status
+                .setSmallIcon(R.drawable.ic_launcher_foreground) // Use a valid icon
                 .addAction(R.drawable.ic_play, "Play", playPendingIntent)
                 .addAction(R.drawable.ic_pause, "Pause", pausePendingIntent)
                 .addAction(R.drawable.ic_stop, "Stop", stopPendingIntent)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setOngoing(true) // Prevents the notification from being swiped away
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setOngoing(true) // Prevent swipe-away
                 .build();
 
+        // Start or update the foreground notification
         startForeground(NOTIFICATION_ID, notification);
+        Log.d("AudioBookPlayerService", "Notification updated with status: " + playbackStatus);
     }
-
     /**
      * Creates a notification channel for devices running Android Oreo and above.
      */
@@ -218,9 +214,9 @@ public class AudioBookPlayerService extends Service {
             NotificationChannel serviceChannel = new NotificationChannel(
                     CHANNEL_ID,
                     "Audiobook Player Service",
-                    NotificationManager.IMPORTANCE_LOW
+                    NotificationManager.IMPORTANCE_DEFAULT //IMPORTANCE_LOW
             );
-
+            serviceChannel.setDescription("Channel for Audiobook Player notifications");
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) {
                 manager.createNotificationChannel(serviceChannel);
